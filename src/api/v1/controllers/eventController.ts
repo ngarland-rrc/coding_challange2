@@ -36,10 +36,10 @@ export const createEvent = async (
             });
         } else {
             // Extract only the fields we need
-            const { name, description } = req.body;
-            const itemData = { name, description };
+            const { id, name, date, capacity, registrationCount } = req.body;
+            const eventData = { id, name, date, capacity, registrationCount };
 
-            const newItem: Event = await eventServices.createEvent(itemData);
+            const newItem: Event = await eventServices.createEvent(eventData);
             res.status(HTTP_STATUS.CREATED).json({
                 message: "Event created successfully",
                 data: newItem,
@@ -59,12 +59,12 @@ export const updateEvent = async (
         const { id } = req.params;
 
         // Extract update fields
-        const { name, description } = req.body;
+        const { name, date, capacity, registrationCount } = req.body;
 
         // Create update data object with only the fields that can be updated
-        const updateData = { name, description };
+        const updateData = { name, date, capacity, registrationCount };
 
-        const updatedItem: Event = await eventServices.updateEvent(id, updateData);
+        const updatedItem: Event = await eventServices.updateEvent(Number(id as string), updateData);
         res.status(HTTP_STATUS.OK).json({
             message: "Event updated successfully",
             data: updatedItem,
@@ -81,7 +81,7 @@ export const deleteEvent = async (
 ): Promise<void> => {
     try {
         const { id } = req.params;
-        await eventServices.deleteEvent(id);
+        await eventServices.deleteEvent(Number(id as string));
         res.status(HTTP_STATUS.OK).json({
             message: "Event deleted successfully",
         });
