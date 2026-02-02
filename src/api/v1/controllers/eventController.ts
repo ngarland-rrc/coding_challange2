@@ -11,7 +11,8 @@ export const getAllEvents = async (
     try {
         const events: Event[] = await eventServices.getAllEvents();
         res.status(HTTP_STATUS.OK).json({
-            message: "Items retrieved successfully",
+            message: "Events retrieved",
+            count: events.length,
             data: events,
         });
     } catch (error) {
@@ -26,18 +27,23 @@ export const createEvent = async (
 ): Promise<void> => {
     try {
         // Basic validation - check for required fields
-        if (!req.body.name) {
+        if (!req.body.id) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Event id is required",
+            });
+        }
+        else if (!req.body.name) {
             res.status(HTTP_STATUS.BAD_REQUEST).json({
                 message: "Event name is required",
             });
-        } else if (!req.body.description) {
+        } else if (!req.body.capacity) {
             res.status(HTTP_STATUS.BAD_REQUEST).json({
-                message: "Event description is required",
+                message: "Event capacity is required",
             });
         } else {
             // Extract only the fields we need
-            const { id, name, date, capacity, registrationCount } = req.body;
-            const eventData = { id, name, date, capacity, registrationCount };
+            const { id, name, capacity } = req.body;
+            const eventData = { id, name, capacity };
 
             const newItem: Event = await eventServices.createEvent(eventData);
             res.status(HTTP_STATUS.CREATED).json({
@@ -56,19 +62,43 @@ export const updateEvent = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const { id } = req.params;
 
-        // Extract update fields
-        const { name, date, capacity, registrationCount } = req.body;
+        console.log(req.body)
 
-        // Create update data object with only the fields that can be updated
-        const updateData = { name, date, capacity, registrationCount };
+        if (!req.body.name) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Event name is required",
+            });
+        }
+        else if (!req.body.date) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Event date is required",
+            });
+        }
+        else if (!req.body.registrationCount) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Event registration count is required",
+            });
+        } else if (!req.body.capacity) {
+            res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: "Event capacity is required",
+            });
+        } else {
 
-        const updatedItem: Event = await eventServices.updateEvent(Number(id as string), updateData);
-        res.status(HTTP_STATUS.OK).json({
-            message: "Event updated successfully",
-            data: updatedItem,
-        });
+            const { id } = req.params;
+
+            // Extract update fields
+            const { name, date, capacity, registrationCount } = req.body;
+
+            // Create update data object with only the fields that can be updated
+            const updateData = { name, date, capacity, registrationCount };
+
+            const updatedEvent: Event = await eventServices.updateEvent(Number(id as string), updateData);
+            res.status(HTTP_STATUS.OK).json({
+                message: "Event updated successfully",
+                data: updatedEvent,
+            });
+        }
     } catch (error) {
         next(error);
     }
@@ -105,4 +135,21 @@ export const getEventById = async (
     } catch (error) {
         next(error);
     }
-}
+};
+
+export const getEventPopularityScore = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const event: Event = await eventServices.getEventPopularityScore(Number(id));
+        res.status(HTTP_STATUS.OK).json({
+            message: "Event retrieved successfully",
+            data: event,
+        });
+    } catch (error) {
+        next(error);
+    }
+};

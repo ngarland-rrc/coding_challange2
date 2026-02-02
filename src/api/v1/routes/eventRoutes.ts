@@ -5,7 +5,7 @@ const router: Router = express.Router();
 
 router.get("/", eventController.getAllEvents);
 router.get("/:id", eventController.getEventById);
-// router.get("/:id/popularity", eventController.getEventPopularityScore);
+router.get("/:id/popularity", eventController.getEventPopularityScore);
 router.post("/", eventController.createEvent);
 router.put("/:id", eventController.updateEvent);
 router.delete("/:id", eventController.deleteEvent);

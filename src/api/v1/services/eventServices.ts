@@ -1,6 +1,17 @@
 import { Event } from "../models/eventModel";
 // import { Attendee } from "../models/attendeeModel";
 
+interface popularityResponse {
+    id: number,
+    name: string,
+    date: string,
+    capacity: number,
+    registrationCount: number,
+    spotsRemaining: number,
+    popularityScore: number,
+    popularityTier: string,
+}
+
 const events: Event[] = [
     {
         id: 1,
@@ -51,14 +62,12 @@ export const getAllEvents = async (): Promise<Event[]> => {
 export const createEvent = async (eventData: {
     id: number;
     name: string;
-    date: string;
     capacity: number;
-    registrationCount: number;
 }): Promise<Event> => {
     const newEvent: Event = {
         id: eventData.id,
         name: eventData.name,
-        date: String(Date.now()),
+        date: String(new Date()),
         capacity: eventData.capacity,
         registrationCount: 0,
     };
@@ -110,13 +119,53 @@ export const deleteEvent = async (id: number): Promise<void> => {
 };
 
 export const getEventById = async (id: number): Promise<Event> => {
-    console.log(id)
     const index: number = events.findIndex((events: Event) => events.id === id);
-    console.log(index)
 
     if (index === -1) {
         throw new Error(`Event with ID ${id} not found`);
     }
 
     return structuredClone(events[index])
+}
+
+export const getEventPopularityScore = async (id: number): Promise<popularityResponse> => {
+    const index: number = events.findIndex((events: Event) => events.id === id);
+
+    if (index === -1) {
+        throw new Error(`Event with ID ${id} not found`);
+    }
+
+    const { name, date, capacity, registrationCount } = events[index];
+    const spotsRemaining: number = capacity - registrationCount;
+    const popularityScore: number = parseFloat(((registrationCount / capacity) * 100).toFixed(1));
+
+    let popularityTier: string = "New";
+
+    switch (true) {
+        case popularityScore >= 90:
+            popularityTier = "Hot";
+            break;
+        case popularityScore >= 70:
+            popularityTier = "Popular";
+            break;
+        case popularityScore >= 50:
+            popularityTier = "Moderate";
+            break;
+        case popularityScore >= 25:
+            popularityTier = "Building";
+    }
+
+
+    const response: popularityResponse = {
+        id: id,
+        name: name,
+        date: date,
+        capacity: capacity,
+        registrationCount: registrationCount,
+        spotsRemaining: spotsRemaining,
+        popularityScore: popularityScore,
+        popularityTier: popularityTier
+    }
+
+    return response
 }
