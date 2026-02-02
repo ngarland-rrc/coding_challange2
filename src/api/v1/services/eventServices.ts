@@ -1,5 +1,5 @@
 import { Event } from "../models/eventModel";
-import { Attendee } from "../models/attendeeModel";
+// import { Attendee } from "../models/attendeeModel";
 
 const events: Event[] = [
     {
@@ -25,19 +25,19 @@ const events: Event[] = [
     },
 ]
 
-const attendees: Attendee[] = [
-    {
-        id: 1,
-        name: "Jordan Smith",
-        email: "jordan.smith@email.com",
-    },
-    {
-        id: 2,
-        name: "Alex Chen",
-        email: "alex.chen@email.com",
-    },
+// const attendees: Attendee[] = [
+//     {
+//         id: 1,
+//         name: "Jordan Smith",
+//         email: "jordan.smith@email.com",
+//     },
+//     {
+//         id: 2,
+//         name: "Alex Chen",
+//         email: "alex.chen@email.com",
+//     },
 
-]
+// ]
 
 /**
  * Retrieves all events from storage 
@@ -108,3 +108,15 @@ export const deleteEvent = async (id: number): Promise<void> => {
 
     events.splice(index, 1);
 };
+
+export const getEventById = async (id: number): Promise<Event> => {
+    console.log(id)
+    const index: number = events.findIndex((events: Event) => events.id === id);
+    console.log(index)
+
+    if (index === -1) {
+        throw new Error(`Event with ID ${id} not found`);
+    }
+
+    return structuredClone(events[index])
+}

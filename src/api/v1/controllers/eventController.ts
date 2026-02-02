@@ -9,10 +9,10 @@ export const getAllEvents = async (
     next: NextFunction
 ): Promise<void> => {
     try {
-        const items: Event[] = await eventServices.getAllEvents();
+        const events: Event[] = await eventServices.getAllEvents();
         res.status(HTTP_STATUS.OK).json({
             message: "Items retrieved successfully",
-            data: items,
+            data: events,
         });
     } catch (error) {
         next(error);
@@ -89,3 +89,20 @@ export const deleteEvent = async (
         next(error);
     }
 };
+
+export const getEventById = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const { id } = req.params;
+        const event: Event = await eventServices.getEventById(Number(id));
+        res.status(HTTP_STATUS.OK).json({
+            message: "Event retrieved successfully",
+            data: event,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
